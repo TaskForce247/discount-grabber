@@ -1,7 +1,7 @@
 import { Crawler } from "./crawler";
-import { SparCrawler } from "./spar";
+import { LidlCrawler } from "./lidl";
 
-const crawlerList = [new SparCrawler()];
+const crawlerList = [new LidlCrawler()];
 
 export const crawlers: Record<string, Crawler> = {};
 crawlerList.forEach((crawler) => (crawlers[crawler.store.id] = crawler));

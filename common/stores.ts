@@ -1,15 +1,15 @@
 import { Store } from "./models";
-
+const allSpacesRegex = / /g;
 export const stores: Record<string, Store> = {
-    spar: {
-        id: "spar",
-        displayName: "Spar",
-        budgetBrands: ["s-budget"],
-        color: "green",
+    lidl: {
+        id: "lidl",
+        displayName: "Lidl",
+        budgetBrands: ["milbona", "alpengut", "cien", "livarno", "wiesentaler"],
+        color: "pink",
         defaultChecked: true,
-        removeOld: false,
-        getUrl: (item) => `https://www.interspar.at/shop/lebensmittel/p/${item.id}`,
-        productUrlBase: "https://www.interspar.at/shop/lebensmittel/p/",
+        getUrl: (item) => `https://www.lidl.dk${item.url}`,
+        productUrlBase: "https://www.lidl.dk/",
+        removeOld: true,
     },
 };
 

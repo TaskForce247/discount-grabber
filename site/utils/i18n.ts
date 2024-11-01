@@ -10,7 +10,7 @@ interface Messages {
     "Discount store brands only": string;
     "Organic only": string;
     Price: string;
-    "currency symbol": "€";
+    "currency symbol": "kr";
     All: string;
     Store: string;
     Name: string;
@@ -51,7 +51,7 @@ const english: Messages = {
     "Discount store brands only": "Discount store brands only",
     "Organic only": "Organic only",
     Price: "Price",
-    "currency symbol": "€",
+    "currency symbol": "kr",
     All: "All",
     Store: "Store",
     Name: "Name",
@@ -92,7 +92,7 @@ const german: Messages = {
     "Discount store brands only": "Nur Diskont-Eigenmarken",
     "Organic only": "Nur Bio",
     Price: "Preis",
-    "currency symbol": "€",
+    "currency symbol": "kr",
     All: "Alle",
     Store: "Kette",
     Name: "Name",
