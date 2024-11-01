@@ -11,6 +11,16 @@ export const stores: Record<string, Store> = {
         productUrlBase: "https://www.lidl.dk/",
         removeOld: true,
     },
+    rema1000: {
+        id: "rema1000",
+        displayName: "REMA 1000",
+        budgetBrands: [],
+        color: "blue",
+        defaultChecked: true,
+        getUrl: (item) => `https://shop.rema1000.dk${item.url}`,
+        productUrlBase: "https://shop.rema1000.dk/",
+        removeOld: true,
+    },
 };
 
 export const STORE_KEYS = Object.keys(stores);

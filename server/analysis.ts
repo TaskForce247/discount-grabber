@@ -169,6 +169,7 @@ export async function updateData(dataDir: string, done: (items: Item[]) => void 
                 try {
                     const rawDataFile = `${dataDir}/${store}-${today}.json`;
                     let rawItems;
+
                     if ("SKIP_FETCHING_STORE_DATA" in process.env && fs.existsSync(rawDataFile + "." + FILE_COMPRESSOR))
                         rawItems = await readJSONAsync(rawDataFile + "." + FILE_COMPRESSOR);
                     else {

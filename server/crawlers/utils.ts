@@ -8,12 +8,6 @@ export function normalizeUnitAndQuantity(
     store: string,
     defaultValue: { quantity: number; unit: Unit }
 ) {
-    console.log("item name", itemName);
-    console.log("raw unit", rawUnit);
-    console.log("raw quantity", rawQuantity);
-    console.log("store units", storeUnits);
-    console.log("store", store);
-
     if (!rawUnit) return defaultValue;
     if (!(typeof rawQuantity == "string" || typeof rawQuantity == "number")) return defaultValue;
 
@@ -22,7 +16,7 @@ export function normalizeUnitAndQuantity(
 
     const mapping = unit in units ? units[unit] : storeUnits[unit];
     if (!mapping) {
-        console.error(`Unknown unit in ${store}: '${unit}' in item ${itemName}`);
+        //  console.error(`Unknown unit in ${store}: '${unit}' in item ${itemName}`);
         return defaultValue;
     }
 

@@ -8,39 +8,60 @@ const HITS = Math.floor(30000 + Math.random() * 2000);
 
 const storeUnits: Record<string, UnitMapping> = {
     "": { unit: "stk", factor: 1 },
-    dosen: { unit: "stk", factor: 1 },
-    flasche: { unit: "stk", factor: 1 },
-    flaschen: { unit: "stk", factor: 1 },
-    "pkg.": { unit: "stk", factor: 1 },
-    l: { unit: "ml", factor: 1000 },
-    ml: { unit: "ml", factor: 1 },
-    g: { unit: "g", factor: 1 },
-    kg: { unit: "g", factor: 1000 },
-    "m²": { unit: "qm", factor: 1 },
-    m2: { unit: "qm", factor: 1 },
+    bakke: { unit: "stk", factor: 1 },
+    ltr: { unit: "ml", factor: 1000 },
+    bdt: { unit: "stk", factor: 1 },
+    pk: { unit: "stk", factor: 1 },
+    rl: { unit: "stk", factor: 1 },
 };
 const simpleUnitRegex = /^(\d+[.,]?\d*)\s*(\w+)\.?/;
+
+// Pattern remains similar for multiplied and range but includes optional whitespace for flexibility.
 const multipliedUnitRegex = /^(\d+[.,]?\d*)\s*x\s*(\d+[.,]?\d*)\s*(\w+)\.?$/;
 const rangeUnitRegex = /^(\d+[.,]?\d*)-(\d+[.,]?\d*)\s*(\w+)\.?$/;
-export class LidlCrawler implements Crawler {
-    store = stores.lidl;
+export class Rema1000Crawler implements Crawler {
+    store = stores.rema1000;
+
+    // async fetchData() {
+    //     const LIDL_SEARCH = `https://www.lidl.dk/p/api/gridboxes/DK/da/?max=${HITS}`;
+    //     return (await get(LIDL_SEARCH)).data.filter((item: any) => !!item.price.price);
+    // }
 
     async fetchData() {
-        const LIDL_SEARCH = `https://www.lidl.dk/p/api/gridboxes/DK/da/?max=${HITS}`;
-        return (await get(LIDL_SEARCH)).data.filter((item: any) => !!item.price.price);
+        const REMA1000_SEARCH = "https://cphapp.rema1000.dk/api/v1/catalog/store/1/withchildren";
+        const response = await get(REMA1000_SEARCH);
+
+        if (!response.data) {
+            throw new Error("Failed to fetch data from Rema 1000 API");
+        }
+        let items = [];
+        response.data.departments.forEach((department) => {
+            department.categories.forEach((category) => {
+                category.items.forEach((item) => {
+                    items.push(item);
+                });
+            });
+        });
+        return items;
     }
 
     getCanonical(rawItem: any, today: string): Item {
-        const price = rawItem.price.price;
-        const description = `${rawItem.keyfacts?.supplementalDescription?.concat(" ") ?? ""}${rawItem.fullTitle}`;
-        const itemName = rawItem.fullTitle;
-        const bio = description.toLowerCase().includes("bio");
-        const unavailable = rawItem.stockAvailability.availabilityIndicator == 0;
-        const productId = rawItem.productId;
+        const price = rawItem.pricing.price; // Adjusted to match the JSON structure
+        const description = rawItem.description;
+        const itemName = rawItem.name;
+        const bio =
+            rawItem.name.toLowerCase().startsWith("øko.") ||
+            rawItem.name.toLowerCase().includes("økologisk") ||
+            rawItem.description.toLowerCase().includes("økologisk") ||
+            rawItem.declaration.toLowerCase().includes("økologisk");
+
+        const unavailable = false; // Adjusted for availability
+        const isWeighted = rawItem.is_self_scale_item;
+        const productId = rawItem.id; // Convert to string for consistency
         const defaultUnit: { quantity: number; unit: Unit } = { quantity: 1, unit: "stk" };
-        let isWeighted = false;
         let quantity = 1;
         let unit: Unit = "stk";
+        const itemUrl = "/varer/" + productId;
 
         // Match the description with the regex patterns
         let matches = description.match(simpleUnitRegex);
@@ -68,8 +89,8 @@ export class LidlCrawler implements Crawler {
             }
         }
 
-        // Normalize the unit and quantity using the utility function
-        const unitAndQuantity = utils.normalizeUnitAndQuantity(description, unit, quantity, storeUnits, this.store.displayName, defaultUnit);
+        // Convert and return the normalized item using utility function
+        const unitAndQuantity = utils.normalizeUnitAndQuantity(rawItem.description, unit, quantity, storeUnits, this.store.displayName, defaultUnit);
         return new Item(
             this.store.id,
             productId,
@@ -81,7 +102,8 @@ export class LidlCrawler implements Crawler {
             isWeighted,
             unitAndQuantity.unit,
             unitAndQuantity.quantity,
-            bio
+            bio,
+            itemUrl
         );
     }
 
