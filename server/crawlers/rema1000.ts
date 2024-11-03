@@ -48,6 +48,7 @@ export class Rema1000Crawler implements Crawler {
     getCanonical(rawItem: any, today: string): Item {
         const price = rawItem.pricing.price; // Adjusted to match the JSON structure
         const description = rawItem.description;
+        const underline = rawItem.underline;
         const itemName = rawItem.name;
         const bio =
             rawItem.name.toLowerCase().startsWith("øko.") ||
@@ -64,19 +65,19 @@ export class Rema1000Crawler implements Crawler {
         const itemUrl = "/varer/" + productId;
 
         // Match the description with the regex patterns
-        let matches = description.match(simpleUnitRegex);
+        let matches = underline.match(simpleUnitRegex);
 
         if (matches) {
             quantity = parseFloat(matches[1].replace(",", "."));
             unit = matches[2] as Unit;
         } else {
-            matches = description.match(multipliedUnitRegex);
+            matches = underline.match(multipliedUnitRegex);
 
             if (matches) {
                 quantity = parseFloat(matches[1].replace(",", ".")) * parseFloat(matches[2].replace(",", "."));
                 unit = matches[3] as Unit;
             } else {
-                matches = description.match(rangeUnitRegex);
+                matches = underline.match(rangeUnitRegex);
 
                 if (matches) {
                     const lower = parseFloat(matches[1].replace(",", "."));
@@ -84,7 +85,7 @@ export class Rema1000Crawler implements Crawler {
                     quantity = (lower + upper) / 2;
                     unit = matches[3] as Unit;
                 } else {
-                    //  console.log("No regex match found for description:", description);
+                    console.log("No regex match found for description:", description);
                 }
             }
         }
